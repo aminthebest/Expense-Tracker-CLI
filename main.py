@@ -125,6 +125,19 @@ def update_expense(title, menu, categories, data_storage, input_prompt_color, su
         print(colored("No Expense Found!", errors_color))
 
 
+def list_expenses(data_storage, title_color, errors_color):
+    if data_storage:
+        print(colored("===== EXPENSES =====\n", title_color))
+
+        for i, expense in enumerate(data_storage, start=1):
+            print(f"{i}. {expense['Description']}")
+            print(f"   Amount: ${expense['amount']}")
+            print(f"   Category: {expense['category']}")
+            print(" ")
+    else:
+        print(colored("No expenses found.", errors_color))
+
+
 def main(title, data_storage,  menu, categories, title_color, input_prompt_color, success_color, errors_color, main_input_color1, main_input_color2):
 
     show_menu_categories(title, menu, categories, title_color)
@@ -144,6 +157,8 @@ def main(title, data_storage,  menu, categories, title_color, input_prompt_color
         if select == 3:
             update_expense(title, menu, categories, data_storage,
                            input_prompt_color, success_color, errors_color, title_color)
+        if select == 4:
+            list_expenses(data_storage, title_color, errors_color)
         if select == 10:
             break
 
