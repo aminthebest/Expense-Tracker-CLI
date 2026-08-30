@@ -1,0 +1,12 @@
+[
+  {
+    "amount": 100,
+    "Description": "book",
+    "category": "Education"
+  },
+  {
+    "amount": 4000,
+    "Description": "bills",
+    "category": "Bills"
+  }
+]

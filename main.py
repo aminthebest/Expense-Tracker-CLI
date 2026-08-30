@@ -1,4 +1,5 @@
 from termcolor import colored
+import json
 
 
 TITLE = "===== EXPENSE TRACKER =====\n"
@@ -48,7 +49,7 @@ def show_menu_categories(title, menu, categories, title_color, permition=False):
             print(f"{key}. {value}")
 
 
-def add_expenses(title, menu, data_storage, categories, input_prompt_color, success_color, title_color):
+def add_expenses(title, menu, data_storage, categories, input_prompt_color, success_color, title_color, errors_color):
     data_dict = {}
 
     amount = int(input(colored("Enter amount: ", input_prompt_color)))
@@ -60,21 +61,25 @@ def add_expenses(title, menu, data_storage, categories, input_prompt_color, succ
     category = int(
         input(colored("Choose a category (by the number): ", input_prompt_color)))
 
-    data_dict["amount"] = amount
-    data_dict["Description"] = description
-    for key, item in categories.items():
-        if category == key:
-            data_dict["category"] = item
+    if category in categories:
 
-    data_storage.append(data_dict)
+        data_dict["amount"] = amount
+        data_dict["Description"] = description
+        for key, item in categories.items():
+            if category == key:
+                data_dict["category"] = item
 
-    print(colored("\nExpense successfully added.", success_color))
+        data_storage.append(data_dict)
+
+        print(colored("\nExpense successfully added.", success_color))
+    else:
+        print(colored("invalid category", errors_color))
 
 
 def delete_expense(data_storage, title_color, input_prompt_color, success_color, errors_color):
 
     print(colored("===== EXPENSES =====\n", title_color))
-
+    found = False
     if data_storage:
         for i, value in enumerate(data_storage, start=1):
             print(
@@ -85,30 +90,39 @@ def delete_expense(data_storage, title_color, input_prompt_color, success_color,
         delet_input = int(
             input(colored("Enter the expense number to delete: ", input_prompt_color)))
 
-        for j, value in enumerate(data_storage, start=1):
+        for j, value in enumerate(data_storage.copy(), start=1):
             if delet_input == j:
+                found = True
                 data_storage.remove(value)
-            else:
-                print(colored("Expense Not Found!", errors_color))
+                break
 
-        print(colored("\nExpense deleted successfully!\n", success_color))
+        if not found:
+            print(colored("Expense Not Found!", errors_color))
+        if found:
+            print(colored("\nExpense deleted successfully!\n", success_color))
     else:
         print(colored("No Expense Exists!", errors_color))
 
 
 def update_expense(title, menu, categories, data_storage, input_prompt_color, success_color, errors_color, title_color):
     if data_storage:
+        found = False
+
         for i, value in enumerate(data_storage, start=1):
             print(
                 f"{i}.{value['Description']} | {value['category']} | ${value['amount']}")
 
         print(" ")
+
         update = int(
             input(colored("Enter expense number to update: ", input_prompt_color)))
+
         print(" ")
 
         for j, item in enumerate(data_storage, start=1):
             if update == j:
+                found = True
+
                 amount = int(
                     input(colored("Enter amount: ", input_prompt_color)))
 
@@ -117,16 +131,26 @@ def update_expense(title, menu, categories, data_storage, input_prompt_color, su
 
                 show_menu_categories(
                     title, menu, categories, title_color, permition=True)
+
                 print("")
 
                 category = int(
                     input(colored("Choose a category (by the number): ", input_prompt_color)))
-                item['amount'] = amount
-                item['Description'] = description
-                item['category'] = category
 
-        print("")
-        print(colored("Expense updated successfully!", success_color))
+                if category in categories:
+                    item['amount'] = amount
+                    item['Description'] = description
+                    item['category'] = categories[category]
+
+                    print(colored("Expense updated successfully!", success_color))
+                else:
+                    print(
+                        colored("Invalid category. Expense was not updated.", errors_color))
+
+                break
+
+        if not found:
+            print(colored("Expense Not Found!", errors_color))
 
     else:
         print(colored("No Expense Exists!", errors_color))
@@ -202,6 +226,28 @@ def calculate_total_expenses(data_storage):
     print(f"Total Expenses: ${total_expenses}")
 
 
+def save_expenses_to_json(data_storage, success_color):
+    with open("expenses.json", "w") as file:
+        json.dump(data_storage, file, indent=2)
+        print(colored("Expenses saved successfully!", success_color))
+
+
+def load_expenses_from_json(data_storage, success_color, errors_color):
+    try:
+        with open("expenses.json", "r") as file:
+            data_storage = json.load(file)
+            print(colored("Expenses loaded successfully!", success_color))
+
+        return data_storage
+
+    except FileNotFoundError:
+        print(colored("json file doesn't exist", errors_color))
+        return data_storage
+    except json.JSONDecodeError:
+        print(colored("invalid JSON", errors_color))
+        return data_storage
+
+
 def main(title, data_storage,  menu, categories, title_color, input_prompt_color, success_color, errors_color, main_input_color1, main_input_color2):
 
     show_menu_categories(title, menu, categories, title_color)
@@ -214,7 +260,7 @@ def main(title, data_storage,  menu, categories, title_color, input_prompt_color
 
         if select == 1:
             add_expenses(title, menu, data_storage, categories,
-                         input_prompt_color, success_color, title_color)
+                         input_prompt_color, success_color, title_color, errors_color)
 
         elif select == 2:
             delete_expense(data_storage, title_color,
@@ -236,6 +282,16 @@ def main(title, data_storage,  menu, categories, title_color, input_prompt_color
 
         elif select == 7:
             calculate_total_expenses(data_storage)
+
+        elif select == 8:
+            save_expenses_to_json(data_storage, success_color)
+
+        elif select == 9:
+            data_storage = load_expenses_from_json(
+                data_storage, success_color, errors_color)
+
+        elif select not in range(1, 11):
+            print(colored("Invalid option.", errors_color))
 
         elif select == 10:
             break
