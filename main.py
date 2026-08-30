@@ -41,6 +41,7 @@ def show_menu_categories(title, menu, categories, title_color, permition=False):
 
         for key, value in menu.items():
             print(f"{key}. {value}")
+
     else:
         print(" ")
         for key, value in categories.items():
@@ -71,6 +72,7 @@ def add_expenses(title, menu, data_storage, categories, input_prompt_color, succ
 
 
 def delete_expense(data_storage, title_color, input_prompt_color, success_color, errors_color):
+
     print(colored("===== EXPENSES =====\n", title_color))
 
     if data_storage:
@@ -109,18 +111,23 @@ def update_expense(title, menu, categories, data_storage, input_prompt_color, su
             if update == j:
                 amount = int(
                     input(colored("Enter amount: ", input_prompt_color)))
+
                 description = input(
                     colored("Enter expense description: ", input_prompt_color))
+
                 show_menu_categories(
                     title, menu, categories, title_color, permition=True)
                 print("")
+
                 category = int(
                     input(colored("Choose a category (by the number): ", input_prompt_color)))
                 item['amount'] = amount
                 item['Description'] = description
                 item['category'] = category
+
         print("")
         print(colored("Expense updated successfully!", success_color))
+
     else:
         print(colored("No Expense Exists!", errors_color))
 
@@ -143,6 +150,7 @@ def search_expenses(data_storage, input_prompt_color, errors_color):
         search = input(colored("Search: ", input_prompt_color))
         print(" ")
         found = False
+
         for i, expense in enumerate(data_storage, start=1):
             if search.casefold() == expense['Description'].casefold() or search.casefold() in expense['Description'].casefold():
                 found = True
@@ -150,8 +158,38 @@ def search_expenses(data_storage, input_prompt_color, errors_color):
                 print(f"   Amount: ${expense['amount']}")
                 print(f"   Category: {expense['category']}")
                 print(" ")
+
         if not found:
             print(colored("No Expenses Found.", errors_color))
+    else:
+        print(colored("No Expense Exists!", errors_color))
+
+
+def filter_by_category(data_storage, categories, errors_color, input_prompt_color):
+    for key, value in categories.items():
+        print(f"{key}. {value}")
+
+    print(" ")
+
+    choos = int(input(colored("Choose a category: ", input_prompt_color)))
+
+    print(" ")
+    found = False
+    if data_storage:
+
+        for key, value in categories.items():
+            if key == choos:
+                for i, expense in enumerate(data_storage, start=1):
+                    if expense['category'] == value:
+                        found = True
+                        print(f"{i}. {expense['Description']}")
+                        print(f"   Amount: ${expense['amount']}")
+                        print(f"   Category: {expense['category']}")
+                        print(" ")
+
+        if not found:
+            print(colored("No expenses found.", errors_color))
+
     else:
         print(colored("No Expense Exists!", errors_color))
 
@@ -163,22 +201,31 @@ def main(title, data_storage,  menu, categories, title_color, input_prompt_color
     while True:
         print(" ")
         select = int(
-            input(colored("Choose an option: ", main_input_color1, main_input_color2)))
+            input(colored("Choose an option:", main_input_color1, main_input_color2)))
         print(" ")
 
         if select == 1:
             add_expenses(title, menu, data_storage, categories,
                          input_prompt_color, success_color, title_color)
+
         elif select == 2:
             delete_expense(data_storage, title_color,
                            input_prompt_color, success_color, errors_color)
+
         elif select == 3:
             update_expense(title, menu, categories, data_storage,
                            input_prompt_color, success_color, errors_color, title_color)
+
         elif select == 4:
             list_expenses(data_storage, title_color, errors_color)
+
         elif select == 5:
             search_expenses(data_storage, input_prompt_color, errors_color)
+
+        elif select == 6:
+            filter_by_category(data_storage, categories,
+                               errors_color, input_prompt_color)
+
         elif select == 10:
             break
 
