@@ -188,10 +188,18 @@ def filter_by_category(data_storage, categories, errors_color, input_prompt_colo
                         print(" ")
 
         if not found:
-            print(colored("No expenses found.", errors_color))
+            print(colored("No Expenses Found.", errors_color))
 
     else:
         print(colored("No Expense Exists!", errors_color))
+
+
+def calculate_total_expenses(data_storage):
+    total_expenses = 0
+    for expense in data_storage:
+        total_expenses += expense['amount']
+
+    print(f"Total Expenses: ${total_expenses}")
 
 
 def main(title, data_storage,  menu, categories, title_color, input_prompt_color, success_color, errors_color, main_input_color1, main_input_color2):
@@ -225,6 +233,9 @@ def main(title, data_storage,  menu, categories, title_color, input_prompt_color
         elif select == 6:
             filter_by_category(data_storage, categories,
                                errors_color, input_prompt_color)
+
+        elif select == 7:
+            calculate_total_expenses(data_storage)
 
         elif select == 10:
             break
